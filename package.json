@@ -1,10 +1,14 @@
 {
   "name": "telldus-server",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A quick REST API to telldus",
   "main": "server.js",
   "author": "Timo Aho <timo.aho@ujo.guru>",
   "license": "BSD-2-Clause",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/Zeukkari/node-telldusserver.git"
+  },
   "dependencies": {
     "express": "~4.0.0",
     "body-parser": "~1.0.1",
