@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Disable zooming -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<!-- JQuery stuff -->
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" type="text/css" media="all" />
+
+<script src="/socket.io/socket.io.js"></script>
+
+<!-- My code -->
+<script src="js/client.js"></script>
+
+<style>
+.containing-element .ui-slider-switch { width: 9em }
+</style>
+
+<title>Home Control</title>
+
+</head>
+
+<body>
+
+<div class="container">
+
+	<h1 class="text-center">Home Control</h1>
+
+	<label for="slider-fill">Dimmer:</label>
+	<input type="range" name="slider-fill" id="dimmer" value="0" min="0" max="255" data-highlight="true">
+
+	<div class="containing-element">
+		<label for="device1">Flip switch 1:</label>
+		<select name="flip-min" id="device1" data-role="slider">
+			<option value="off">Switch Off</option>
+			<option value="on">Switch On</option>
+		</select>
+	</div>
+
+	<div class="containing-element">
+		<label for="device2">Flip switch 2:</label>
+		<select name="flip-min" id="device2" data-role="slider">
+			<option value="off">Switch Off</option>
+			<option value="on">Switch On</option>
+		</select>
+	</div>
+
+	<div class="containing-element">
+		<label for="device3">Flip switch 3:</label>
+		<select name="flip-min" id="device3" data-role="slider">
+			<option value="off">Switch Off</option>
+			<option value="on">Switch On</option>
+		</select>
+	</div>
+
+	<!-- syncing done with socket.io
+	<div class="ui-btn ui-input-btn ui-shadow">
+	Sync
+	<input type="button" data-corners="false" data-enhanced="true" value="Sync" id="syncButton"></input>
+	</div>
+	-->
+
+</div>
+
+</body>
+</html>
