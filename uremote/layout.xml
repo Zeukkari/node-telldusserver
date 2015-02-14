@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+	<row>
+		<label id="message" text="Home Control" />
+	</row>
+	<row>
+		<button text="PDU On" ontap="turnOn" />
+		<button text="PDU Off" ontap="turnOff" />
+	</row>
+	<row>
+		<button text="Telldus 1 On" ontap="telldus1On" />
+		<button text="Telldus 1 Off" ontap="telldus1Off" />
+	</row>
+	<row>
+		<button text="Telldus 2 On" ontap="telldus2On" />
+		<button text="Telldus 2 Off" ontap="telldus2Off" />
+	</row>
+	<row>
+		<button text="Telldus 3 On" ontap="telldus3On" />
+		<button text="Telldus 3 Off" ontap="telldus3Off" />
+	</row>
+	<row>
+		<!-- 
+		<button text="Telldus 4 On" ontap="lights" />
+		<button text="Telldus 4 Off" ontap="darkness" />
+		-->
+		<slider id="dimmer" text="dimmer" progress="255" progressmax="255" onup="update" /> 
+	</row>
+</layout>
