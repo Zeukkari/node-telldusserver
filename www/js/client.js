@@ -13,7 +13,7 @@ var deviceMap = {
 function getDevices() {
 
 	var responseText = $.ajax( {
-		url : serverURL + "/telldus",
+		url : serverURL + "/api/devices",
 		success :  function( data ) {
 			console.info("Devices: ", data);
 			return data;
@@ -30,6 +30,11 @@ function getDevices() {
 }
 
 function syncView(devices) {
+	if(!devices || !devices.length) {
+		throw "Sync error!!!";
+		return;
+	}
+
 	//var devices = getDevices();
 
 	devices.forEach(function(device) {
@@ -71,9 +76,9 @@ function init() {
 		var dimLevel = 	$( "#dimmer" ).val();
 
 		if(dimLevel > 0) {
-			$.post( serverURL + "/telldus/4", { cmd : "dim", dimLevel : dimLevel } )
+			$.post( serverURL + "/api/4", { cmd : "dim", dimLevel : dimLevel } )
 		} else {
-			$.post( serverURL + "/telldus/4", { cmd : "turnOff" } )
+			$.post( serverURL + "/api/4", { cmd : "turnOff" } )
 		}
 
 	});
@@ -82,9 +87,9 @@ function init() {
 		var flipState = $( "#device1" ).val();
 
 		if( flipState == "on" ) {
-			$.post( serverURL + "/telldus/1", { cmd : "turnOn" } );
+			$.post( serverURL + "/api/1", { cmd : "turnOn" } );
 		} else {
-			$.post( serverURL + "/telldus/1", { cmd : "turnOff" } );
+			$.post( serverURL + "/api/1", { cmd : "turnOff" } );
 		}
 	});
 
@@ -92,9 +97,9 @@ function init() {
 		var flipState = $( "#device2" ).val();
 
 		if( flipState == "on" ) {
-			$.post( serverURL + "/telldus/2", { cmd : "turnOn" } );
+			$.post( serverURL + "/api/2", { cmd : "turnOn" } );
 		} else {
-			$.post( serverURL + "/telldus/2", { cmd : "turnOff" } );
+			$.post( serverURL + "/api/2", { cmd : "turnOff" } );
 		}
 	});
 
@@ -102,18 +107,27 @@ function init() {
 		var flipState = $( "#device3" ).val();
 
 		if( flipState == "on" ) {
-			$.post( serverURL + "/telldus/3", { cmd : "turnOn" } );
+			$.post( serverURL + "/api/3", { cmd : "turnOn" } );
 		} else {
-			$.post( serverURL + "/telldus/3", { cmd : "turnOff" } );
+			$.post( serverURL + "/api/3", { cmd : "turnOff" } );
 		}
 	});
 
-	$( "#syncButton" ).on('click', function() {
-		syncView();
-	});
+	// $( "#syncButton" ).on('click', function() {
+	// 	syncView();
+	// });
 
 	socket.on('state change', function(devices){
 		syncView(devices);
+	});
+
+	socket.on('error', function(reason){
+		alert("Unable to connect to Socket.IO");
+		console.error("Unable to cnonect to Socket.IO", reason);
+	});
+
+	socket.on('connect', function(){
+		console.info("Succesfully established a working and authorized connection");
 	});
 }
 
