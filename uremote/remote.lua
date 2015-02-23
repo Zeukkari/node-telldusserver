@@ -27,7 +27,7 @@ actions.telldus2On = function ()
 	local headers = { ["Cache-Control"] = "no-cache" };	
 
 	local req = { method = "post",
-	              url = "http://192.168.1.104:8075/telldus/1",
+	              url = "http://192.168.1.104:8075/api/1",
 	              mime = "application/x-www-form-urlencoded",
 	              headers = headers,
 	              content = "cmd=turnOn" };
@@ -38,11 +38,10 @@ end
 actions.telldus2Off = function ()
 	layout.message.text = "Telldus off";
 
-	local headers = { key = "value",
-	                  foo = "bar" };	
+	local headers = { ["Cache-Control"] = "no-cache" };	
 
 	local req = { method = "post",
-	              url = "http://192.168.1.104:8075/telldus/1",
+	              url = "http://192.168.1.104:8075/api/1",
 	              mime = "application/x-www-form-urlencoded",
 	              headers = headers,
 	              content = "cmd=turnOff" };
@@ -58,7 +57,7 @@ actions.telldus2On = function ()
 	local headers = { ["Cache-Control"] = "no-cache" };	
 
 	local req = { method = "post",
-	              url = "http://192.168.1.104:8075/telldus/2",
+	              url = "http://192.168.1.104:8075/api/2",
 	              mime = "application/x-www-form-urlencoded",
 	              headers = headers,
 	              content = "cmd=turnOn" };
@@ -69,11 +68,10 @@ end
 actions.telldus2Off = function ()
 	layout.message.text = "Telldus off";
 
-	local headers = { key = "value",
-	                  foo = "bar" };	
+	local headers = { ["Cache-Control"] = "no-cache" };	
 
 	local req = { method = "post",
-	              url = "http://192.168.1.104:8075/telldus/2",
+	              url = "http://192.168.1.104:8075/api/2",
 	              mime = "application/x-www-form-urlencoded",
 	              headers = headers,
 	              content = "cmd=turnOff" };
@@ -88,7 +86,7 @@ actions.telldus3On = function ()
 	local headers = { ["Cache-Control"] = "no-cache" };	
 
 	local req = { method = "post",
-	              url = "http://192.168.1.104:8075/telldus/3",
+	              url = "http://192.168.1.104:8075/api/3",
 	              mime = "application/x-www-form-urlencoded",
 	              headers = headers,
 	              content = "cmd=turnOn" };
@@ -99,11 +97,10 @@ end
 actions.telldus3Off = function ()
 	layout.message.text = "Telldus off";
 
-	local headers = { key = "value",
-	                  foo = "bar" };	
+	local headers = { ["Cache-Control"] = "no-cache" };	
 
 	local req = { method = "post",
-	              url = "http://192.168.1.104:8075/telldus/3",
+	              url = "http://192.168.1.104:8075/api/3",
 	              mime = "application/x-www-form-urlencoded",
 	              headers = headers,
 	              content = "cmd=turnOff" };
@@ -118,7 +115,7 @@ actions.lights = function ()
 	local headers = { ["Cache-Control"] = "no-cache" };	
 
 	local req = { method = "post",
-	              url = "http://192.168.1.104:8075/telldus/4",
+	              url = "http://192.168.1.104:8075/api/4",
 	              mime = "application/x-www-form-urlencoded",
 	              headers = headers,
 	              content = "cmd=turnOn" };
@@ -129,11 +126,10 @@ end
 actions.darkness = function ()
 	layout.message.text = "Telldus off";
 
-	local headers = { key = "value",
-	                  foo = "bar" };	
+	local headers = { ["Cache-Control"] = "no-cache" };	
 
 	local req = { method = "post",
-	              url = "http://192.168.1.104:8075/telldus/4",
+	              url = "http://192.168.1.104:8075/api/4",
 	              mime = "application/x-www-form-urlencoded",
 	              headers = headers,
 	              content = "cmd=turnOff" };
@@ -154,11 +150,10 @@ actions.update = function (progress)
 	end
 
 
-	local headers = { key = "value",
-	                  foo = "bar" };	
+	local headers = { ["Cache-Control"] = "no-cache" };
 
 	local req = { method = "post",
-	              url = "http://192.168.1.104:8075/telldus/4",
+	              url = "http://192.168.1.104:8075/api/4",
 	              mime = "application/x-www-form-urlencoded",
 	              headers = headers,
 	              content = content };
