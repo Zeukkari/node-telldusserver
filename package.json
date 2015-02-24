@@ -17,5 +17,12 @@
     "express-session": "~1.10.3",
     "cookie": "~0.1.2",
     "method-override": "~2.3.1"
+  },
+  "keywords": [
+    "telldus"
+  ],
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/Zeukkari/node-telldusserver.git"
   }
 }
