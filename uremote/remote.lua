@@ -21,7 +21,7 @@ actions.turnOff = function ()
 	local resp = http.get("http://192.168.1.104:8085/pimeys");
 end
 
-actions.telldus2On = function ()
+actions.telldus1On = function ()
 	layout.message.text = "Telldus on";
 
 	local headers = { ["Cache-Control"] = "no-cache" };	
@@ -35,7 +35,7 @@ actions.telldus2On = function ()
 	local resp = http.request(req);
 end
 
-actions.telldus2Off = function ()
+actions.telldus1Off = function ()
 	layout.message.text = "Telldus off";
 
 	local headers = { ["Cache-Control"] = "no-cache" };	
