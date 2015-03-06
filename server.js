@@ -150,7 +150,54 @@ router.route('/api/:device_id')
 				console.log(err);
 			});
 		} else if(cmd == "dim") {
-			var dimLevel = parseInt(req.body.dimLevel);
+
+			// Turn dim level up or down
+
+			var dimLevel = req.body.dimLevel;
+			console.log("dimLevel", dimLevel);
+
+			var op = dimLevel[0];
+			console.log("op", op);
+
+
+			var dimLevel = parseInt(dimLevel);
+			dimLevel = Math.abs(dimLevel);
+			
+
+			var getCurrentDimLevel = function() {
+				var brightness;
+				var devices = telldus.getDevicesSync();
+				devices.forEach(function(device) {
+		    	if(device.id == deviceId) {
+		    		if(device.status.name == "DIM") {
+		    			brightness = device.status.level;
+		    		} else if(device.status.name == "ON") {
+		    			brightness = 255;
+		    		} else if (device.status.name == "OFF") {
+		    			brightness = 0;
+		    		}
+		    	}				
+				});
+				console.log("brightness", brightness);
+				return brightness;
+			}
+
+			if(op == "+") {
+				var brightness = getCurrentDimLevel();
+				dimLevel = brightness + dimLevel;
+			} else if (op == "-") {
+				var brightness = getCurrentDimLevel();
+				dimLevel = brightness - dimLevel;
+			}
+
+
+			if(dimLevel > 255) {
+				dimLevel = 255;
+			}
+			if(dimLevel < 0 ) {
+				dimLevel = 0;
+			}
+
 			console.log("Dim to :" + dimLevel);
 			telldus.dim(deviceId, dimLevel, function(err) {
 				console.log(err);
