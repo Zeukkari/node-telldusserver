@@ -11,6 +11,7 @@ var port = process.env.PORT || 8075;
 // Telldus
 var telldus = require('telldus');
 
+
 // Passport.js
 var passport = require('passport');
 var util = require('util');
@@ -25,6 +26,35 @@ var http = require('http');
 
 // Config
 var config = require('./config');
+
+// Telldus bridge
+telldus.addDeviceEventListener(function(deviceId, data) {
+	console.log('deviceId: ', deviceId);
+  console.log('Device event: ', data);
+
+  // Map external transmitter devices to reciever devices
+  var deviceBridge = config.bridge;
+
+  if(!deviceBridge[deviceId]) {
+	  console.log("No device bridge for: " + deviceId);
+	  return;
+  }
+
+  var recieverDeviceId = deviceBridge[deviceId];
+
+  var cmd = data.name;
+
+  if(cmd == "OFF") {
+  	telldus.turnOff(recieverDeviceId,function(err) {
+    	console.log('Device' + recieverDeviceId + ' is now OFF');
+    });
+  } else if(cmd == "ON") {
+  	telldus.turnOn(recieverDeviceId,function(err) {
+    	console.log('Device' + recieverDeviceId + ' is now ON');
+  	});
+  }
+});
+
 
 // Express dependencies
 var cookie = require('cookie');
@@ -42,9 +72,9 @@ passport.deserializeUser(function(obj, done) {
 // credentials (in this case, an accessToken, refreshToken, and GitHub
 // profile), and invoke a callback with a user object.
 passport.use(new GitHubStrategy({
-	clientID: config.github.appId,
-	clientSecret: config.github.appSecret,
-	callbackURL: config.github.callbackURL
+	clientID: config.auth.github.appId,
+	clientSecret: config.auth.github.appSecret,
+	callbackURL: config.auth.github.callbackURL
 },
 function(accessToken, refreshToken, profile, done) {
 	console.info("accessToken: ", accessToken);
@@ -270,7 +300,7 @@ function matchLocalSubnets(requestIp) {
 	// LAN authentication
 
 	var matchOk = false;
-	config.local.subnets.forEach(function(subnet) {
+	config.auth.local.subnets.forEach(function(subnet) {
 		if(requestIp.search(subnet) == 0) {
 			matchOk = true;
 		}
