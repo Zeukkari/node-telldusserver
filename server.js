@@ -81,7 +81,11 @@ function(accessToken, refreshToken, profile, done) {
 	console.info("refreshToken: ", refreshToken);
 	console.info("profile: ", profile);
 
-	if(profile.username != config.github.username) {
+	var githubuser = config.auth.github.username;
+
+
+	// Skip github user checkup if the config key is missing
+	if(githubuser && profile.username != githubuser) {
 		throw "Error: invalid username!";
 		return;
 	} else {
@@ -296,17 +300,21 @@ io.on('connection', function(socket){
 
 console.log('Server listening on port ' + port);
 
-function matchLocalSubnets(requestIp) {
+function matchLocalSubnets(requestIP) {
 	// LAN authentication
+
+	var inSubnet = require('insubnet');
 
 	var matchOk = false;
 	config.auth.local.subnets.forEach(function(subnet) {
-		if(requestIp.search(subnet) == 0) {
+		if(inSubnet.Auto(requestIP, subnet)) {
 			matchOk = true;
+			console.info("Local IP ok: ", requestIP, subnet);
 		}
 	});
 
 	return matchOk;
+
 }
 
 // IP based authentication & Passport.js authentication
@@ -319,8 +327,7 @@ function isAuthenticated(req) {
 	}
 
 	// Validate LAN connections
-	var requestIP = req.ip;
-	if(matchLocalSubnets(requestIP)) {
+	if(matchLocalSubnets(req.ip)) {
 		return true;
 	}
 

@@ -8,7 +8,7 @@ module.exports = {
   	},
     // FIXME: Use proper subnet checking
   	local : {
-  		subnets : [ "192.168.1.", "127.0.0." ]
+  		subnets : [ "192.168.1.0/24", "127.0.0.1/32" ]
   	}
   },
   /*
