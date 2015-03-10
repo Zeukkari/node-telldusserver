@@ -4,10 +4,26 @@ var socket = io();
 var serverURL = "";
 
 var deviceMap = {
-	1 : "device1",
-	2 : "device2",
-	3 : "device3",
-	4 : "device4" // also dimmer
+	1 : {
+		domId : "device1",
+		type : "switch"
+	},
+	2 : {
+		domId : "device2",
+		type : "switch"
+	},
+	3 : {
+		domId : "device3",
+		type : "switch"
+	},
+	4 : {
+		domId : "device4",
+		type : "dimmer"
+	},
+	9 : {
+		domId : "device5",
+		type : "magnet switch"
+	}
 }
 
 function getDevices() {
@@ -39,85 +55,85 @@ function syncView(devices) {
 
 	devices.forEach(function(device) {
 
+		var deviceId = device.id;
+
 		var status = device.status;
 
-		// Dimmer
-		if(device.name == "Kattolamppu") {
-			if(status.name == "DIM") {
-				var dimLevel = status.level;
-				$( "#dimmer" ).val(dimLevel).slider("refresh");
-			} else if(status.name == "ON"){
-				$( "#dimmer" ).val(255).slider("refresh");
-			} else {
-				$( "#dimmer" ).val(0).slider("refresh");
-			}
+		// Skip unmapped devices
+		if(!deviceMap[deviceId]) {
+			return;
 		}
 
-		var flipswitch = $( "#" + deviceMap[device.id] );
+		// Dimmers
+		if(deviceMap[deviceId].type == "dimmer") {
+			var dimmer = $( "#" + deviceMap[deviceId].domId )
+			if(status.name == "DIM") {
+				var dimLevel = status.level;
+				dimmer.val(dimLevel).slider("refresh");
+			} else if(status.name == "ON"){
+				dimmer.val(255).slider("refresh");
+			} else {
+				dimmer.val(0).slider("refresh");
+			}
+		} else if(deviceMap[deviceId].type == "switch") {
+			var flipswitch = $( "#" + deviceMap[deviceId].domId );
 
-		// on/off switches
-		if(status.name == "OFF") {
-			flipswitch.val("off").slider("refresh");
-		} else {
-			// Also flips dimmed switched on
-			flipswitch.val("on").slider("refresh"); // ON/DIM
+			// on/off switches
+			if(status.name == "OFF") {
+				flipswitch.val("off").slider("refresh");
+			} else {
+				// Also flips dimmed switched on
+				flipswitch.val("on").slider("refresh"); // ON/DIM
+			}
+		} else if(deviceMap[deviceId].type == "magnet switch") {
+			var flipswitch = $( "#" + deviceMap[deviceId].domId );
+
+			// on/off switches
+			if(status.name == "OFF") {
+				flipswitch.val("off").slider("refresh");
+			} else {
+				// Also flips dimmed switched on
+				flipswitch.val("on").slider("refresh"); // ON/DIM
+			}
 		}
 
 	});
 
 }
 
+function initListener(deviceId) {
+	var device = deviceMap[deviceId];
+
+	var domId = device.domId;
+	var deviceType = device.type;
+	var deviceElement = $("#" + domId);
+
+	if(deviceType == "dimmer") {
+		deviceElement.on('slidestop', function(){
+			var dimLevel = 	deviceElement.val();
+			if(dimLevel > 0) {
+				$.post( serverURL + "/api/" + deviceId, { cmd : "dim", dimLevel : dimLevel } )
+			} else {
+				$.post( serverURL + "/api/" + deviceId, { cmd : "turnOff" } )
+			}
+		});
+	} else if(device.type == "switch") {
+		deviceElement.on('change', function( data ) {
+			var flipState = deviceElement.val();
+			if( flipState == "on" ) {
+				$.post( serverURL + "/api/" + deviceId, { cmd : "turnOn" } );
+			} else {
+				$.post( serverURL + "/api/" + deviceId, { cmd : "turnOff" } );
+			}
+		});
+	}
+
+}
+
 function init() {
 
-	syncView(getDevices());
-
-	//$( "#dimmer" ).slider();
-	$( "#dimmer" ).on('slidestop', function(){
-		var dimLevel = 	$( "#dimmer" ).val();
-
-		if(dimLevel > 0) {
-			$.post( serverURL + "/api/4", { cmd : "dim", dimLevel : dimLevel } )
-		} else {
-			$.post( serverURL + "/api/4", { cmd : "turnOff" } )
-		}
-
-	});
-
-	$( "#device1" ).on('change', function( data ) { 
-		var flipState = $( "#device1" ).val();
-
-		if( flipState == "on" ) {
-			$.post( serverURL + "/api/1", { cmd : "turnOn" } );
-		} else {
-			$.post( serverURL + "/api/1", { cmd : "turnOff" } );
-		}
-	});
-
-	$( "#device2" ).on('change', function( data ) { 
-		var flipState = $( "#device2" ).val();
-
-		if( flipState == "on" ) {
-			$.post( serverURL + "/api/2", { cmd : "turnOn" } );
-		} else {
-			$.post( serverURL + "/api/2", { cmd : "turnOff" } );
-		}
-	});
-
-	$( "#device3" ).on('change', function( data ) { 
-		var flipState = $( "#device3" ).val();
-
-		if( flipState == "on" ) {
-			$.post( serverURL + "/api/3", { cmd : "turnOn" } );
-		} else {
-			$.post( serverURL + "/api/3", { cmd : "turnOff" } );
-		}
-	});
-
-	// $( "#syncButton" ).on('click', function() {
-	// 	syncView();
-	// });
-
 	socket.on('state change', function(devices){
+		console.info("state change!", devices);
 		syncView(devices);
 	});
 
@@ -129,6 +145,13 @@ function init() {
 	socket.on('connect', function(){
 		console.info("Succesfully established a working and authorized connection");
 	});
+
+
+	Object.keys(deviceMap).forEach(function(deviceId){
+		initListener(deviceId);
+	});
+
+	syncView(getDevices());
 }
 
 $(document).ready(function() {

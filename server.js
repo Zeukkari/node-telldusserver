@@ -27,61 +27,6 @@ var http = require('http');
 // Config
 var config = require('./config');
 
-// Telldus bridge
-telldus.addDeviceEventListener(function(deviceId, data) {
-	console.log('deviceId: ', deviceId);
-  console.log('Device event: ', data);
-
-  // ON or OFF
-  var cmd = data.name;
-  console.info("cmd: ", cmd);
-
-  // Map external transmitter devices to reciever devices
-  var deviceBridge = config.bridge;
-
-  if(!deviceBridge[deviceId]) {
-	  console.log("No device bridge for: " + deviceId);
-	  return;
-  }
-
-  
-
-  // Evoke script
-  if(deviceBridge[deviceId].script) {
-		var util = require('util');
-		var exec = require('child_process').exec;
-
-		console.info("bridge to script: ", deviceBridge[deviceId].script);
-
-	  if(cmd == "OFF") {
-	  	exec(deviceBridge[deviceId].script + " off", function(error){
-	  		if(error) console.err(error);
-	  	})
-	  } else if(cmd == "ON") {
-	  	exec(deviceBridge[deviceId].script + " on", function(error){
-	  		if(error) console.err(error);
-	  	})
-	  }
-
-  }
-
-  // Direct links
-  if(deviceBridge[deviceId].bridgeTo) {
-	  var recieverDeviceId = deviceBridge[deviceId].bridgeTo;
-
-	  if(cmd == "OFF") {
-	  	telldus.turnOff(recieverDeviceId,function(err) {
-	    	console.log('Device' + recieverDeviceId + ' is now OFF');
-	    });
-	  } else if(cmd == "ON") {
-	  	telldus.turnOn(recieverDeviceId,function(err) {
-	    	console.log('Device' + recieverDeviceId + ' is now ON');
-	  	});
-	  }
-  }
-
-});
-
 
 // Express dependencies
 var cookie = require('cookie');
@@ -131,6 +76,69 @@ var server = http.Server(app);
 
 var io = require('socket.io')(server);
 
+// Telldus bridge
+telldus.addDeviceEventListener(function(deviceId, data) {
+	console.log('deviceId: ', deviceId);
+  console.log('Device event: ', data);
+
+  // ON or OFF
+  var cmd = data.name;
+  console.info("cmd: ", cmd);
+
+  // Map external transmitter devices to reciever devices
+  var deviceBridge = config.bridge;
+
+  if(!deviceBridge[deviceId]) {
+	  console.log("No device bridge for: " + deviceId);
+	  return;
+  }
+
+  // Evoke script
+  if(deviceBridge[deviceId].script) {
+		var util = require('util');
+		var exec = require('child_process').exec;
+
+		console.info("bridge to script: ", deviceBridge[deviceId].script);
+
+	  if(cmd == "OFF") {
+	  	exec(deviceBridge[deviceId].script + " off" + " " + deviceId, function(error){
+	  		if(error) console.err(error);
+	  	})
+	  } else if(cmd == "ON") {
+	  	exec(deviceBridge[deviceId].script + " on" + " " + deviceId, function(error){
+	  		if(error) console.err(error);
+	  	})
+	  }
+  }
+
+  // Direct links
+  if(deviceBridge[deviceId].bridgeTo) {
+	  var recieverDeviceId = deviceBridge[deviceId].bridgeTo;
+
+	  if(cmd == "OFF") {
+	  	telldus.turnOff(recieverDeviceId,function(err) {
+	    	console.log('Device' + recieverDeviceId + ' is now OFF');
+	    });
+	  } else if(cmd == "ON") {
+	  	telldus.turnOn(recieverDeviceId,function(err) {
+	    	console.log('Device' + recieverDeviceId + ' is now ON');
+	  	});
+	  }
+  }
+
+  // Emit state change
+	telldus.getDevices(function(err,devices) {
+	  if ( err ) {
+	    console.log('Error: ' + err);
+	  } else {
+	    // The list of devices is returned
+	    console.info("Emit state change from bridge!", devices);
+	    io.emit('state change', devices);
+	  }
+	});
+
+});
+
 
 var router = express.Router();              // get an instance of the express Router
 
@@ -164,11 +172,54 @@ app.get('/auth/github/callback',
 	}
 );
 
-app.get('/', function(req, res, next){
+// Access control
+app.all('/', function(req, res, next){
 	if (isAuthenticated(req)) {
 		return next(); 
 	}
 	res.redirect('/login');
+});
+
+// Jade View Model
+var viewModel = {
+	devices : [
+		{
+			name : "Living room light",
+			deviceid : 4,
+			type : "dimmer",
+			labelid : "device4",
+			label : "Living room light"
+		},{
+			name : "Desk light",
+			deviceid : 2,
+			type : "switch",
+			labelid : "device2",
+			label : "Desk light"
+		},{
+			name : "Monitor LED",	
+			deviceid : 3,
+			type : "switch",
+			labelid : "device3",
+			label : "Monitor LED"
+		},{
+			name : "Fan",
+			deviceid : 1,
+			type : "switch",
+			labelid : "device1",
+			label : "Fan"
+		},{
+			name : "Door sensor",
+			deviceid : 9,
+			type : "magnet switch",
+			labelid : "device5",
+			label : "Door sensor"			
+		}
+	]
+}
+
+app.get('/', function(req, res){
+	//res.redirect('/login.html');
+	res.render('index.jade', viewModel);
 });
 
 app.get('/login', function(req, res){
@@ -182,6 +233,10 @@ app.get('/logout', function(req, res){
 });
 
 app.use(express.static(__dirname + '/www'));
+
+var path = require('path');
+app.set('views', path.join("www", 'views'));
+app.set('view engine', 'jade');
 
 // Access control here!
 router.use('/api', function(req, res, next) {

@@ -17,13 +17,14 @@
     "express-session": "~1.10.3",
     "cookie": "~0.1.2",
     "method-override": "~2.3.1",
-    "insubnet": "0.0.8"
+    "insubnet": "0.0.8",
+    "jade": "~1.9.2"
   },
   "keywords": [
     "telldus"
   ],
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/Zeukkari/node-telldusserver.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zeukkari/node-telldusserver.git"
   }
 }

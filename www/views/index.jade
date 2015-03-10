@@ -1,0 +1,36 @@
+doctype html(lang='en')
+head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    // Disable zooming
+    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
+    // JQuery stuff
+    script(src='js/jquery.min.js')
+    script(src='js/jquery.mobile-1.4.5.min.js')
+    link(rel='stylesheet', href='css/jquery.mobile-1.4.5.min.css', type='text/css', media='all')
+    script(src='/socket.io/socket.io.js')
+    // My code
+    script(src='js/client.js')
+    style.
+      .containing-element .ui-slider-switch { width: 9em }
+    title Home Control
+  body
+    .container
+      h1.text-center Home Control (from template)
+      each device in devices
+        if device.type == "switch"
+          .containing-element
+            label(for=device.labelid) #{device.label}:
+            select(name='flip-min', data-role='slider', id=device.labelid)
+              option(value='off') Off
+              option(value='on') On
+        else if device.type == "magnet switch"
+          .containing-element
+            label(for=device.labelid) #{device.label}:
+            select(name='flip-min', data-role='slider', id=device.labelid)
+              option(value='off') Closed
+              option(value='on') Open
+        else if device.type == "dimmer"
+          .containing-element
+            label(for=device.labelid) #{device.label}:
+            input(type='range', name='slider-fill', value='0', min='0', max='255', data-highlight='true', id=device.labelid)
