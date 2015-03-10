@@ -32,6 +32,10 @@ telldus.addDeviceEventListener(function(deviceId, data) {
 	console.log('deviceId: ', deviceId);
   console.log('Device event: ', data);
 
+  // ON or OFF
+  var cmd = data.name;
+  console.info("cmd: ", cmd);
+
   // Map external transmitter devices to reciever devices
   var deviceBridge = config.bridge;
 
@@ -40,19 +44,42 @@ telldus.addDeviceEventListener(function(deviceId, data) {
 	  return;
   }
 
-  var recieverDeviceId = deviceBridge[deviceId];
+  
 
-  var cmd = data.name;
+  // Evoke script
+  if(deviceBridge[deviceId].script) {
+		var util = require('util');
+		var exec = require('child_process').exec;
 
-  if(cmd == "OFF") {
-  	telldus.turnOff(recieverDeviceId,function(err) {
-    	console.log('Device' + recieverDeviceId + ' is now OFF');
-    });
-  } else if(cmd == "ON") {
-  	telldus.turnOn(recieverDeviceId,function(err) {
-    	console.log('Device' + recieverDeviceId + ' is now ON');
-  	});
+		console.info("bridge to script: ", deviceBridge[deviceId].script);
+
+	  if(cmd == "OFF") {
+	  	exec(deviceBridge[deviceId].script + " off", function(error){
+	  		if(error) console.err(error);
+	  	})
+	  } else if(cmd == "ON") {
+	  	exec(deviceBridge[deviceId].script + " on", function(error){
+	  		if(error) console.err(error);
+	  	})
+	  }
+
   }
+
+  // Direct links
+  if(deviceBridge[deviceId].bridgeTo) {
+	  var recieverDeviceId = deviceBridge[deviceId].bridgeTo;
+
+	  if(cmd == "OFF") {
+	  	telldus.turnOff(recieverDeviceId,function(err) {
+	    	console.log('Device' + recieverDeviceId + ' is now OFF');
+	    });
+	  } else if(cmd == "ON") {
+	  	telldus.turnOn(recieverDeviceId,function(err) {
+	    	console.log('Device' + recieverDeviceId + ' is now ON');
+	  	});
+	  }
+  }
+
 });
 
 

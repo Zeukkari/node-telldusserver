@@ -1,6 +1,6 @@
 {
   "name": "telldus-server",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Home control system powered by Telldus",
   "main": "server.js",
   "author": "Timo Aho <timo.aho@ujo.guru>",
