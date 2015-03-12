@@ -1,0 +1,108 @@
+swagger: '2.0'
+info:
+  title: Node Telldus Server API
+  description: API documentation for node.js telldus-server module.
+  version: "0.0.1"
+# array of all schemes that your API supports
+schemes:
+  - http
+# will be prefixed to all paths
+basePath: /api
+host: akrasia.ujo.guru:7173
+produces:
+  - application/json
+paths:
+  /devices:
+    get:
+      summary: Telldus devices
+      description: |
+        The Devices endpoint returns information about configured Telldus 
+        devices. The response includes the display name, id, status and 
+        other details about each device.
+      security:
+        - github_auth:
+          - user
+        - ip: []
+      responses:
+        200:
+          description: An array of devices
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Device'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+            
+  /{deviceId}:
+    post:
+      summary: Post a to a Telldus device.
+      security:
+        - github_auth:
+          - user
+        - ip: []
+      parameters:
+        - name: deviceId
+          in: path
+          description: Device ID
+          required: true
+          type: number
+        - name: cmd
+          in: query
+          description: Telldus command
+          required: false
+          type: string
+      responses:
+        200:
+          description: TODO
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Device:
+    properties:
+      id:
+        type: string
+        description: Device id.
+      name:
+        type: string
+        description: Device name.
+      methods:
+        type: array
+        description: An array of supported device methods.
+        items:
+          type: string
+      model:
+        type: string
+        description: Device name.        
+      protocol:
+        type: string
+        description: Device name.
+      type:
+        type: string
+      status:
+        type: object
+        description: An object describing device status.
+
+  Error:
+    properties:
+      error:
+        type: string
+        description: Respect my authoritah!
+        
+securityDefinitions:
+  ip:
+    type: apiKey
+    name: IP based
+    in: header
+    description: IP based access control.
+  github_auth:
+    type: oauth2
+    description: GitHub OAuth 2.0 authentication.
+    flow: accessCode
+    authorizationUrl: https://github.com/login/oauth/authorize
+    tokenUrl: https://github.com/login/oauth/access_token
+    scopes:
+      user: Grants read/write access to profile info only.
